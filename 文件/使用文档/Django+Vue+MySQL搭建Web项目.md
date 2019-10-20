@@ -1,4 +1,4 @@
-# Django+Vue+MySQL
+# Django+Vue+MySQL 搭建Web项目
 
 Django `Python` 作服务端
 Vue.js `JavaScript` 作前端
@@ -46,7 +46,7 @@ python manage.py startapp appname
 
 在`settings.py`中用MySQL替换默认的SQLite3
 
-```py
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -60,7 +60,7 @@ DATABASES = {
 
 将app加入**installed—apps**列表
 
-```py
+```python
 INSTALLED_APPS = [
     ......
 
@@ -70,7 +70,7 @@ INSTALLED_APPS = [
 
 在`models.py`中写model，此处仅为简单示例：
 
-```py
+```python
 from django.db import models
 
 class SimpleModel(models.Model):
@@ -82,7 +82,7 @@ class SimpleModel(models.Model):
 
 对应的，在`view.py`中新增接口，使用`JsonResponse`返回Json格式的数据
 
-```py
+```python
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.core import serializers
@@ -107,7 +107,7 @@ return JsonResponse(response)
 
 新建文件`app/urls.py`，将接口添加到路由里
 
-```py
+```python
 from django.conf.urls import url,
 from . import views
 
@@ -116,8 +116,7 @@ urlpatterns = [url(r'show_key_name$',views.show_key_name,),]
 
 将app中urls添加到`project/urls.py`，完成路由
 
-```py
-
+```python
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
@@ -157,7 +156,7 @@ python manage.py runserver
 
 在`project/settings.py`中
 
-```py
+```python
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -179,7 +178,7 @@ TEMPLATES = [
 
 在`project/settings.py`中
 
-```py
+```python
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "appfront/dist/static"),
 ]
@@ -199,7 +198,7 @@ pip install django-cors-headers
 
 修改`settings.py`
 
-```py
+```python
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
