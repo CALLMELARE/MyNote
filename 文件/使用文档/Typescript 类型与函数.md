@@ -1,7 +1,9 @@
 # TypeScript类型与函数
 
 TypeScript = **Typed** JavaScript
+
 TypeScript 的核心是 **Type**（类型）
+
 TypeScript 可以**在编译时帮你做类型检查，但无法确保运行时不翻车**
 
 ## 基本类型
@@ -248,3 +250,193 @@ function Foo(value1: string, value2: string | number | boolean){
 
 ### 类型保护与区分类型
 
+当我们想确切获得某值的类型，首先想到使用类型断言强制类型推测
+
+```js
+interface Teacher{
+    teach():void;
+}
+interface Student{
+    learn():void;
+}
+function getPerson():Teacher|Student{
+    return {} as Teacher;
+}
+const person=getPerson();
+
+(<Student>person).learn();
+(<Teacher>person).teach();
+```
+
+而在TypeScript中存在类型保护机制，可以规避繁琐的类型断言
+
+```js
+function isTeacher(person: Teacher | Student): person is Teacher {
+    return (<Teacher>perosn).teach !== undefined;
+}
+```
+
+> **注意**
+> `person is Teacher`就是类型保护语句
+> <u>每当变量调用`isTeacher()`时，TypeScript会把变量指定为类型保护中的类型</u>
+
+### typeof和instanceof
+
+观察以下代码
+
+```js
+function isNumber(val: number | string): val is number {
+    return typeof val === "number";
+}
+```
+
+TypeScript会将`typeof……`视为一种类型保护。
+
+`typeof`**只有在匹配到基本类型时，才会启用类型保护**
+
+除`typeof`外，`instanceof`也有类似的作用，其类型保护更加精细，可以将类作为比较对象
+
+### 类型别名
+
+给类型起一个新名字，~~从而降低文档编写复杂度~~
+
+使用`type`关键字描述类型变量
+
+```js
+type Name = string;
+```
+
+### ！！！索引类型与映射类型
+
+待补充
+
+### ！！！类型推导
+
+待补充 
+
+## 函数
+
+### 定义函数
+
+TypeScript能够根据返回值自动推断出类型，英雌我们常常省略返回值类型。
+
+```js
+function fn1(x: number, y: number): number {
+    return x + y;
+}
+```
+
+### 参数
+
+#### 可选参数
+
+如果我们希望后续的参数是可选的，应当使用问号`?`
+
+```js
+function fn1(value1: string, value2?: string) {
+    return value1 + " " + value2;
+}
+```
+
+> **注意**
+> 可选参数必须放在必要参数之后
+
+#### 默认参数
+
+如果无值传入，可以设定一个默认初始化的参数
+
+```js
+function fn1(value1: string, value2 = "default") {
+    return value1 + " " + value2;
+}
+```
+
+在这个例子中，`value2`同样是可以省略的，缺省值为`"default"`。
+
+> **注意**
+> 与可选参数不同，带默认值的参数无需放在最后，它可以在任何位置
+
+#### 剩余参数
+
+在JavaScript中，当传入参数数量未知，可以使用`arguments`来访问所有传入参数
+
+在TypeScript中，你可以吧参数集中到一个变量中，加省略号`...`即可
+
+```js
+function fn1(value1: string, ...values: string[]) {
+    return value1 + " " + values.join(" ");
+}
+```
+
+### 回调函数和promise
+
+在使用基于回调方式的异步函数时需要注意以下准则
+
+- 一定不要调用两次回调
+- 一定不要抛出错误
+
+#### 创建promise
+
+`promise`是有状态的：`pending`，`resolved`，`rejected`
+
+`promise`由Promise构造器创建，**resolve对应处理成功，reject对应处理失败**
+
+```js
+const promise = new Promise((resolve, reject) => {
+    resolve("It works");
+    reject("It doesn't works");
+})
+```
+
+#### 订阅promise
+
+`promise`使用`then`或`catch`来订阅
+
+```js
+promise.then((res) => {
+    console.log(res);// It works
+})
+promise.catch((err)=>{
+    console.log(errr);// It doesn't works
+})
+```
+
+#### promise的链式性
+
+链式性是promise的**核心优点**
+
+你可以将之前任何`promise`点上的异常都在最后的`promise.catch()`中处理
+
+#### 并行控制流
+
+如果打算执行一系列异步任务，并在所有任务完成后执行操作（如拉取多个API的数据）
+
+promise提供了`Promise.all()`函数
+
+```js
+//拉取第一个信息
+function fetchApi1(UID: string): Promise<{}> {
+    //...
+}
+function fetchApi2(UID: string): Promise<{}> {
+    //...
+}
+function fetchApi3(UID: string): Promise<{}> {
+    //...
+}
+Promise.all([fetchApi1("233"), fetchApi2("233"), fetchApi3("233")])
+    .then(
+        res => {
+            console.log(res);
+        }
+    )
+```
+
+#### async/await
+
+`async/await`基于迭代器实现，它会暂停函数的执行能力，等待结果返回。
+
+## 参考
+
+- 《TypeScript实战指南》 机械工业出版社
+- MDN
